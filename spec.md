@@ -1,5 +1,3 @@
-Mình sẽ bổ sung đúng 4 điểm Supervisor feedback vào spec của bạn. Đây là bản hoàn chỉnh:
-
 SKILL SPEC: Content Pipeline Pro
 
 Process
