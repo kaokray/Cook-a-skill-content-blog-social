@@ -1,267 +1,663 @@
-# SKILL SPEC: Content Pipeline Pro
+# SKILL SPEC: Content Pipeline Pro v2
+## Overview
 
----
+A complete end-to-end content pipeline that turns a keyword + project spec into a publish-ready, GEO-optimized blog article — enriched with real community voice from UGC. Covers every stage from trend monitoring to final scoring.
 
-## Process
+**Pipeline stages:**
 
-**Input**: Enter a keyword/topic and provide the project spec `.md` file.
-
-### Phase 1 - Content Brief (~2 minutes)
-The skill generates a detailed brief, including:
-- target audience
-- search intent
-- outline
-- tone
-- word count
-- reference angles
-- CTA direction
-
-### Phase 2 - Write Blog (~3 to 5 minutes)
-The skill writes a full blog article based on the brief:
-- correct structure
-- consistent tone
-- includes data/examples
-
-### Phase 3 - Editor & QA (~2 minutes)
-The skill reviews the draft and produces checks and suggestions:
-- grammar
-- tone consistency
-- SEO score (keyword density, meta title/description, heading structure, readability)
-- improvement recommendations
-
-**Output**: Publish-ready blog article + SEO report + QA checklist  
-**Total time**: 10 to 15 minutes per blog article (~90% faster)
+```
+[0] X TREND MONITOR — simulated 24/7, auto-proposes hot keywords on session start
+      ↓
+[1] KEYWORD RESEARCH — scored, multi-source, data-backed
+      ↓
+[2] CONTENT BRIEF & OUTLINE — mapped to long-tail keywords + social expansion points
+      ↓
+[3] UGC ENRICHMENT — mine community comments → ready-to-paste blog sections
+      ↓
+[4] DRAFT — human-style writing, minimum 3 data points, zero AI patterns
+      ↓
+[5] SEO + GEO OPTIMIZATION — on-page checklist + AI-bot-friendly formatting
+      ↓
+[6] QA SCORING REPORT — rubric-based score, publish verdict
+```
 
 ---
 
 ## User
 
-- **Primary**: Content Writer / SEO Writer  
-- **Secondary**: Marketing Manager, Social Media Executive (needs content fast)  
-- **Context**: Working in a crypto/Web3 content team that must ship blog posts regularly, with consistent tone and SEO optimization
+- **Primary**: Content Writer / SEO Writer
+- **Secondary**: Marketing Manager, Social Media Executive
+- **Context**: Crypto/Web3 content team shipping blog posts regularly — needs consistent tone, SEO optimization, and content that gets cited by AI search engines (Perplexity, Google SGE, ChatGPT Search)
 
 ---
 
 ## Input
 
-### Required Inputs
+### Required
 
 | Field | Type | Description | Example |
 |---|---|---|---|
-| `keyword_or_topic` | string | Keyword or topic to write about | "what is liquid staking", "DeFi trends 2025" |
-| `project_spec` | file (.md) | Project spec file containing product info, target audience, value prop, and tone of voice | `spec.md` for Project XYZ |
+| `project_spec` | file (.md) | Product info, target audience, value prop, tone of voice | `spec.md` for Project XYZ |
+| `keyword_or_topic` | string | Keyword or topic to write about (can be auto-proposed from Stage 0) | "what is liquid staking" |
 
-### Optional Inputs
+### Optional
 
 | Field | Type | Description | Default |
 |---|---|---|---|
-| `language` | string | Language of the article | "English" |
+| `ugc_urls` | list of URLs | X threads, Reddit posts, forums to mine for UGC | None — Stage 3 skipped if absent |
+| `blog_draft` | text or URL | Existing draft to cross-reference in UGC stage | None |
+| `language` | string | Output language | English |
 | `word_count` | number | Desired word count | 1500–2000 |
 | `tone` | string | Writing tone | Auto-detected from spec |
-| `target_platform` | string | Publishing platform | "Blog/Website" |
-| `additional_context` | string | Extra context or preferred angle | — |
+| `additional_context` | string | Extra angle or instruction | — |
 
 ---
 
-## Output
+## Stage 0 — X Trend Monitor (Simulated 24/7)
 
-### Phase 1 Output - Content Brief
+### Purpose
+Ensure the writer never misses a trending topic while offline. Every time a new session opens, the skill automatically scans X for hot topics relevant to the project spec — and proposes them before the writer even asks.
 
-```md
-# Content Brief
+### Trigger
+**Runs automatically at the start of every new conversation**, before the user types anything else. No manual command needed.
 
-## Basic Info
-- **Target Keyword**: [keyword]
-- **Search Intent**: [informational / navigational / transactional / commercial]
-- **Target Audience**: [describe audience based on spec]
-- **Tone of Voice**: [detected from spec or from input]
-- **Word Count Target**: [word count]
+### How It Works
 
-## Keyword Research
-- **Primary Keyword**: [main keyword]
-- **Secondary Keywords**: [3-5 related keywords]
-- **LSI Keywords**: [5-8 semantically related keywords]
-- **Questions People Ask**: [3-5 common search questions]
+**Step 1 — Parse the spec**
+Read `project_spec.md` to extract:
+- Domain / niche (e.g., DeFi, liquid staking, perp DEX)
+- Target audience
+- Key product themes and competitors
 
-## Content Angle & Differentiation
-- **Angle**: [main angle]
-- **What makes this different**: [how it differs from competitor content]
-- **Key value for reader**: [what the reader gets after reading]
+**Step 2 — Run X trend searches**
+Use web search to simulate real-time X monitoring. Run all of the following:
 
-## Outline
-1. **[H2 Heading 1]**
-   - Key points to cover
-   - Suggested data/examples
-2. **[H2 Heading 2]**
-   - Key points to cover
-   - Suggested data/examples
-3. ... (continue)
+```
+site:x.com [domain keyword] -filter:replies
+[domain keyword] trending twitter 2025
+[domain keyword] discussion OR debate OR thread twitter
+[competitor name] twitter sentiment 2025
+[domain keyword] viral tweet this week
+```
 
-## CTA Direction
-- **CTA goal**: [what the reader should do next]
-- **CTA placement**: [where the CTA should appear]
+For crypto/Web3 specifically, also search:
+```
+crypto twitter trending today
+defi twitter hot topic this week
+[domain keyword] CT (crypto twitter) discussion
+```
 
-## References & Angles
-- [Reference/source 1]
-- [Reference/source 2]
+**Step 3 — Score each topic by trending potential**
+
+| Signal | Weight | Scoring |
+|---|---|---|
+| Recency (posted within 48h) | 30% | Within 24h = 10, 24–48h = 7, older = 3 |
+| Estimated engagement | 30% | Viral (1K+ likes signals) = 10, high = 7, low = 3 |
+| Relevance to spec domain | 25% | Direct = 10, adjacent = 6, weak = 2 |
+| Debate / controversy signal | 15% | Active debate = 10, one-sided = 5, none = 2 |
+
+**Step 4 — Output trend alert**
+
+Present at session start, before any user input:
+
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔥 X TREND ALERT — [Date/Time]
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Based on your project spec, here's what's hot on X right now:
+
+TREND 1 (Score: X/10) 🔴 HOT
+  Topic:       [topic name]
+  Why it's trending: [1-sentence explanation]
+  Angle for your blog: [specific content angle]
+  Suggested keyword: "[keyword]"
+  Sample X discussion: "[paraphrased post or thread summary]"
+
+TREND 2 (Score: X/10) 🟡 RISING
+  Topic:       [topic name]
+  Why it's trending: [1-sentence explanation]
+  Angle for your blog: [specific content angle]
+  Suggested keyword: "[keyword]"
+
+TREND 3 (Score: X/10) 🟢 WATCH
+  Topic:       [topic name]
+  Why it's trending: [1-sentence explanation]
+  Angle for your blog: [specific content angle]
+  Suggested keyword: "[keyword]"
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+→ Want to write about one of these? Just say "go with Trend 1"
+  and I'll start the pipeline from Stage 1 automatically.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+### Limitations
+- This is simulated monitoring via web search — not a real-time API connection to X
+- Results reflect what search engines have indexed from X, not live X data
+- If web search is disabled, skip Stage 0 and flag: "Stage 0 unavailable — web search is off. Please provide a keyword manually."
+
+---
+
+## Stage 1 — Keyword Research
+
+### Goal
+Identify 1 primary keyword + 5–10 secondary/LSI keywords with real data and scoring — not random picks.
+
+### Step 1 — Generate seed keywords
+Brainstorm 8–12 candidate keywords from the topic:
+- Head terms (1–2 words)
+- Mid-tail (3–4 words)
+- Long-tail / question variants (5+ words: "how to...", "best...", "what is...")
+
+### Step 2 — Fetch Google Trends data
+For each seed keyword, run web searches:
+- `google trends [keyword] 2025` → trend direction (rising / stable / declining)
+- `[keyword] search interest 2025`
+
+Extract: trend direction, estimated score (0–100), seasonal pattern.
+
+### Step 3 — Fetch X social buzz
+For each seed keyword, run:
+- `site:x.com [keyword]`
+- `[keyword] trending twitter 2025`
+- `[keyword] discussion reddit OR twitter OR forum`
+
+Extract: buzz level (High/Medium/Low), what people are actually debating, notable angles.
+
+### Step 4 — Fetch search volume signals
+Run free-source searches to estimate volume:
+- `[keyword] search volume 2025`
+- `ubersuggest [keyword]` or `semrush [keyword]` for visible free-tier data
+- Google "People Also Ask" for [keyword] → extract as long-tail candidates
+- Google "Related searches" for [keyword] → extract additional candidates
+
+Label all estimated data as `[estimated]`.
+
+> If user has Ahrefs/SEMrush API key: ask once — "Do you have an Ahrefs or SEMrush API key for exact volume data?" If yes, use it. If no, proceed with estimated data.
+
+### Step 5 — Score and rank keywords
+
+| Signal | Weight | Scoring |
+|---|---|---|
+| Search volume | 35% | <100=2, 100–1K=4, 1K–10K=7, 10K+=10 |
+| Keyword difficulty (inverse) | 30% | Low=10, Medium=6, Hard=3 |
+| Google Trends direction | 20% | Rising=9, Stable=6, Declining=2 |
+| X/Social buzz | 15% | High=9, Medium=5, Low=2 |
+
+Pick top 1 as primary, next 5–8 as secondary/LSI.
+
+### Output
+
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+KEYWORD RESEARCH RESULTS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+PRIMARY KEYWORD (Score: X/10)
+  Keyword:       [keyword]
+  Volume:        [X/month — estimated]
+  Difficulty:    [Low/Medium/Hard]
+  Trend:         [Rising📈 / Stable➡️ / Declining📉]
+  X Buzz:        [High/Medium/Low] — "[what people are actually debating]"
+  Search Intent: [Informational/Navigational/Transactional/Commercial]
+
+SECONDARY KEYWORDS:
+┌─────────────────────────┬────────┬──────┬────────────┬──────────┬───────┐
+│ Keyword                 │ Volume │  KD  │ Trend      │ Buzz     │ Score │
+├─────────────────────────┼────────┼──────┼────────────┼──────────┼───────┤
+│ [keyword 1]             │ [est.] │ [KD] │ Rising📈   │ High     │  X.X  │
+│ [keyword 2]             │ [est.] │ [KD] │ Stable➡️   │ Medium   │  X.X  │
+│ ...                     │        │      │            │          │       │
+└─────────────────────────┴────────┴──────┴────────────┴──────────┴───────┘
+
+KEY INSIGHT FROM SOCIAL DATA:
+"[What people are actually debating/asking on X/forums]"
+→ Use this as the hook in the intro and FAQ section.
+
+CONTENT ANGLE RECOMMENDATION:
+[1–2 sentences on the unique angle based on trending signals + content gap]
 ```
 
 ---
 
-### Phase 2 Output - Blog Article
+## Stage 2 — Content Brief & Outline
 
-A complete blog article that includes:
-- Meta Title (<=60 characters, includes the primary keyword)
-- Meta Description (<=155 characters, includes the primary keyword)
-- Blog body that follows the brief outline with clear H2/H3 structure
-- A strong hook in the introduction
-- Data, examples, and clear explanations in the body
-- A conclusion with a CTA
-- Internal linking suggestions (if the spec provides context)
+### Goal
+Build a logically sequenced outline that follows the reader's mental journey, maps every long-tail keyword to a section, and flags where UGC enrichment (Stage 3) will be inserted.
+
+### Step 1 — Determine flow pattern
+
+| Pattern | When to use | Arc |
+|---|---|---|
+| Problem → Solution | How-to, guides | Problem → Why → Solution → Validation |
+| What → Why → How | Explainers | Definition → Importance → Application |
+| Comparison | Best X, X vs Y | Context → Criteria → Options → Recommendation |
+| Journey | Beginner guides | Starting point → Stages → End state |
+| Argument | Opinion, trends | Claim → Evidence → Counter → Conclusion |
+
+### Step 2 — Map long-tail keywords to sections
+Assign each long-tail keyword to a specific H2 or H3. No section without a keyword anchor. Build a mapping table before writing the outline.
+
+### Step 3 — Flag UGC insertion points
+For each major H2, identify where community voice adds depth:
+- Common misconceptions debated on X → add "Community Perspectives" H3
+- Recurring user questions → convert to FAQ entry
+- Real user experiences → flag for Stage 3 UGC mining
+
+### Output
+
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+CONTENT BRIEF
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Target Keyword:     [primary keyword]
+Flow Pattern:       [chosen pattern]
+Search Intent:      [type]
+Recommended Length: [X words]
+Target Audience:    [who, what they know, what they need]
+Content Goal:       [rank / educate / convert / build trust]
+GEO Target:         AI search engines (Perplexity, Google SGE, ChatGPT Search)
+
+LONG-TAIL KEYWORD MAP:
+[keyword 1] → H2: [section title]
+[keyword 2] → H3: [subsection title]
+[keyword 3] → FAQ: [question form]
+
+UGC INSERTION POINTS (flagged for Stage 3):
+[Section X] ← UGC: community counterpoints
+[Section Y] ← UGC: real user experiences / case studies
+[FAQ]       ← UGC: real questions from X/Reddit threads
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+OUTLINE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+H1: [Title — primary keyword + compelling angle]
+
+── INTRO ──────────────────────────────────
+  Hook:    [specific stat or bold claim — never a generic opener]
+  Problem: [what the reader is struggling with]
+  Promise: [what this article delivers]
+
+── BODY ───────────────────────────────────
+H2: [Section 1]                                    🔑 [keyword]
+  H3: [Subsection A]
+  H3: [Subsection B]
+  H3: 💬 UGC BLOCK — [community counterpoints]     ← Stage 3 insertion
+
+H2: [Section 2]                                    🔑 [keyword]
+  H3: [Subsection A]
+  H3: 💬 UGC BLOCK — [real user experiences]       ← Stage 3 insertion
+
+[... continue for all mapped keywords ...]
+
+── FAQ ────────────────────────────────────
+H2: Frequently Asked Questions
+  H3: [Question from long-tail keyword]?           🔑 [keyword]
+  H3: [Question from X/Reddit community]?          💬 UGC source
+
+── CONCLUSION ─────────────────────────────
+  Summary: [2–3 key takeaways]
+  Takeaway: [the one thing to remember]
+  CTA: [specific next action]
+
+KEYWORD COVERAGE CHECK:
+  Primary keyword:    H1 ✓ | Intro ✓ | H2 ✓ | Conclusion ✓
+  Long-tail keywords: [list each → assigned section ✓]
+  Unplaced keywords:  [list → decide: add section or cut]
+```
 
 ---
 
-### Phase 3 Output - QA Report
+## Stage 3 — UGC Enrichment
 
-```md
-# QA & SEO Report
+### Purpose
+Mine real community comments from X threads, Reddit, and forums → transform them into ready-to-paste blog sections that add authentic human voice. This is the layer that separates this content from AI slop — and the key signal that gets cited by AI search engines.
 
-## SEO Score: [X/100]
+**Why this matters for GEO:**
+Reddit alone accounts for ~21% of citations in Google AI Overviews (early 2026). Content with real UGC gets 2–3x more visibility than theory-only articles. E-E-A-T's "Experience" signal is the one thing AI-generated content fundamentally cannot fake.
 
-### SEO Checklist
-| Check | Points | Status | Details |
-|-------|--------|--------|---------|
-| Primary keyword in title | 10 | ✅/❌ | [details] |
-| Primary keyword in H1 | 10 | ✅/❌ | [details] |
-| Primary keyword in first 100 words | 10 | ✅/❌ | [details] |
-| Keyword density (1-2%) | 15 | ✅/❌ | [X%] |
-| Meta title length (<=60 chars) | 10 | ✅/❌ | [X chars] |
-| Meta description length (<=155 chars) | 10 | ✅/❌ | [X chars] |
-| H2/H3 structure present | 10 | ✅/❌ | [details] |
-| Image alt text suggestions | 5 | ✅/❌ | [suggestions] |
-| Internal linking opportunities | 10 | ✅/❌ | [suggestions] |
-| Readability score | 10 | ✅/❌ | [score] |
+### Trigger
+Runs when `ugc_urls` are provided. If no URLs given, skip this stage and note: "Stage 3 skipped — no UGC URLs provided. Add X/Reddit links for community enrichment."
 
-**Scoring thresholds:**
-- 85-100: Publish-ready
-- 70-84: Minor fixes needed
+### Step 1 — Fetch and extract comments
+For each URL:
+- Use `web_fetch` to retrieve the full page content
+- Extract: original post body, all comments/replies with engagement metrics (likes, upvotes, reply count), timestamp, nesting level
+- Fallback: if URL is behind a login wall → "Could not access [URL]. Paste comment text directly and I'll process it."
+
+### Step 2 — Quality scoring (0–10)
+
+| Signal | Weight | Scoring |
+|---|---|---|
+| Engagement (likes/upvotes) | 30% | Top 10% = 10, top 25% = 7, top 50% = 5, bottom 50% = 2 |
+| Content length | 20% | <10 words = 1, 10–50 = 5, 50–150 = 8, 150+ = 10 |
+| Contains data/numbers | 15% | Yes = 10, No = 3 |
+| Personal experience markers | 15% | "I tried...", "In my case..." = 10, None = 3 |
+| Substantive reply thread | 10% | 3+ quality replies = 10, 1–2 = 6, none = 3 |
+| Sentiment strength | 10% | Strong opinion = 8, Neutral = 4 |
+
+Filter: Score ≥ 6 → High Value. Score < 3 → Discard (spam, memes, off-topic).
+
+### Step 3 — Classify into 3 UGC categories
+
+**Category A — Counter-Arguments & Alternative Perspectives**
+Challenges the main article claims, edge cases, overlooked downsides.
+Output: 150–300 word prose paragraph, balanced tone, titled "Community Perspectives: Notable Counterpoints"
+
+**Category B — Real-World FAQs**
+Direct questions from comments, especially highly-upvoted or repeated ones.
+Output: Q&A pairs (3–6 max), answers synthesized from community + AI knowledge. Uncertain answers flagged with ⚠️ [Verify before publishing]
+
+**Category C — Personal Experiences & Mini Case Studies**
+First-person accounts with specific numbers, before/after narratives, warnings from experience.
+Output: 2–4 mini case studies, each 50–100 words, professionally paraphrased — never fabricated.
+Format:
+```
+**[Descriptive title]**
+[Paraphrased experience preserving original details and specifics]
+— Source: [Platform] user | Engagement: [X likes/upvotes]
+```
+
+**Never:**
+- Fabricate comments or data points not in the source
+- Include real usernames — use "a user on X", "a Reddit commenter"
+- Include spam, memes, or personal attacks even if highly upvoted
+
+### Step 4 — Viral pattern analysis
+For each high-value comment (score ≥ 7), identify why it resonated:
+
+| Trigger | Description |
+|---|---|
+| Data-backed claim | Specific numbers, dollar amounts |
+| Contrarian take | Opposes popular opinion with reasoning |
+| Personal vulnerability | Shares failure or honest struggle |
+| Insider knowledge | Suggests expertise or access |
+| Simplification | Breaks down complexity clearly |
+
+Output: Top 3 viral triggers + 2 actionable writing tips derived from patterns.
+
+### Step 5 — Map UGC blocks to outline
+Match each UGC block to the insertion points flagged in Stage 2 outline.
+
+### Output format
+
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+UGC ENRICHMENT REPORT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Sources: [X] URLs | Total comments: [X] | High-value: [Y] ([Z]%)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SECTION A: COMMUNITY PERSPECTIVES — NOTABLE COUNTERPOINTS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[150–300 word prose — ready to copy-paste into blog]
+→ INSERT AFTER: [H2 section from outline]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SECTION B: FAQ — REAL QUESTIONS FROM THE COMMUNITY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Q1: [Real question — paraphrased]
+A1: [Answer synthesized from community + AI knowledge]
+    Source: [X] users asked this | Top answer: [Y] upvotes
+→ INSERT INTO: FAQ section
+
+[... up to Q6 ...]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SECTION C: REAL USER EXPERIENCES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+CASE 1: [Descriptive title]
+[Paraphrased experience — professional tone, original details preserved]
+— Source: [Platform] user | [X] likes/upvotes
+— Viral trigger: [why this resonated]
+→ INSERT AFTER: [H2 section from outline]
+
+[... up to CASE 4 ...]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+VIRAL PATTERN ANALYSIS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Top triggers: 1. [type] — [X] comments | 2. [type] | 3. [type]
+Writing tips:
+→ [Tip 1 based on dominant pattern]
+→ [Tip 2]
+```
+
+---
+
+## Stage 4 — Draft Writing
+
+### Goal
+Write the full article following the outline, with UGC blocks inserted at flagged points. Human-style, data-backed, zero AI patterns.
+
+### Writing Principles
+
+**Structure**
+- Intro: Hook (stat/bold claim/specific fact — never a generic opener) → Problem → Promise
+- Body: Follow outline exactly. Each H2 opens with a topic sentence. UGC blocks inserted at flagged points.
+- Conclusion: Synthesize key takeaways (do not restate all H2s) → clear CTA
+
+**Tone (default for crypto/Web3)**
+- Expert-to-peer: assumes reader knows basic crypto, not a developer
+- Direct and confident — no hedging
+- Short sentences preferred; vary length for rhythm
+- Define technical terms inline on first use
+- Use "you" to address the reader directly
+
+**Data requirements**
+- Minimum 3 data points per article (stats, on-chain figures, market numbers)
+- Source every stat inline: `[stat] — [Source, Year]`
+- Find real stats via web search before drafting: `[topic] statistics 2025`, `[topic] data report 2025`
+- If no real data found: insert `[DATA NEEDED: search "[suggested query]"]` — never invent statistics
+
+**AI-pattern avoidance — never write:**
+- "In today's fast-paced world..." / "In the realm of..."
+- "It's important to note that..." / "It goes without saying..."
+- "Furthermore," / "Moreover," / "In conclusion,"
+- "Delve into" / "Dive into" / "Leverage" (abstract)
+- "As we navigate the ever-evolving landscape of..."
+- "Game-changer" / "Revolutionary" / "Transformative" / "Comprehensive"
+- Rhetorical openers: "Have you ever wondered...?"
+- "Not only... but also..." / "Both... and..." (overused)
+- Bullet dashes (`- item`) or em dashes (`X — Y`) → use numbered lists or rewrite as sentences
+- Conclusion openers: "In conclusion," / "To summarize," / "We hope this article..."
+
+Instead: open every section with a direct statement or specific fact. Let data carry the weight.
+
+**Keyword integration**
+- Primary keyword in first 100 words, at least one H2, and conclusion
+- Secondary/LSI keywords woven in naturally — never forced
+- Target density: 1–1.5% for primary keyword
+
+---
+
+## Stage 5 — SEO + GEO Optimization
+
+### SEO On-Page Checklist
+
+**Title & Meta**
+- [ ] Meta title: 50–60 characters, primary keyword near the front
+- [ ] Meta description: 150–160 characters, primary keyword, includes hook/CTA
+- [ ] URL slug: short, lowercase, hyphenated, primary keyword
+
+**Content Structure**
+- [ ] H1 contains primary keyword (only one H1)
+- [ ] H2s use secondary keywords or question variants
+- [ ] Primary keyword in first 100 words
+- [ ] Primary keyword in conclusion
+- [ ] Word count meets brief recommendation
+
+**Keyword Usage**
+- [ ] Primary keyword density: 1–1.5%
+- [ ] No keyword stuffing
+- [ ] LSI/semantic keywords distributed throughout
+- [ ] 2–3 long-tail variants used
+
+**Readability**
+- [ ] Paragraphs: max 3–4 lines
+- [ ] No walls of text
+- [ ] Bullet/numbered lists used where appropriate
+
+**Links**
+- [ ] 2+ internal link suggestions noted
+- [ ] 1–2 authoritative external sources noted
+- [ ] Image alt text recommendations included
+
+**Schema Opportunities**
+- [ ] FAQ section → FAQ schema
+- [ ] How-to steps → HowTo schema
+- [ ] Data points present → E-E-A-T signals
+
+---
+
+### GEO Optimization (AI-Bot-Friendly Content)
+
+GEO = Generative Engine Optimization. The goal is to make this content easy for AI agents (Perplexity, Google SGE, ChatGPT Search, future autonomous agents) to parse, extract, and cite.
+
+#### GEO Writing Rules
+
+**1. Answer-first structure (every section)**
+Each H2 section must start with a 1–2 sentence direct answer to the implied question — before any elaboration.
+```
+✅ "Liquid staking lets users stake ETH while keeping their tokens liquid. Unlike traditional staking, you receive a receipt token (like stETH) that can be used across DeFi protocols."
+❌ "When it comes to liquid staking, there are several important aspects to consider..."
+```
+
+**2. Explicit entity labeling**
+Name entities clearly so AI can extract them into knowledge graphs:
+- Product names, protocol names with full context on first mention
+- Numbers with units always spelled out: "3.2% APY" not "3.2%"
+- Dates explicitly stated: "as of Q1 2025" not "recently"
+
+**3. FAQ section is mandatory**
+Minimum 5 Q&A pairs. Each answer must be:
+- Self-contained (understandable without reading the rest of the article)
+- 50–150 words maximum per answer
+- Starts with a direct answer, then elaborates
+
+**4. Structured data suggestions (include in QA report)**
+Flag which schema types apply:
+```
+SUGGESTED STRUCTURED DATA:
+- FAQPage schema → apply to FAQ section
+- Article schema → apply to full post (datePublished, author, headline)
+- HowTo schema → apply if article contains step-by-step instructions
+- BreadcrumbList → apply for site navigation signals
+```
+
+**5. Answer box optimization**
+For the primary keyword, write one "featured snippet candidate" block:
+- 40–60 word definition or step-list
+- Placed early in the article (within first H2)
+- Formatted as a clear paragraph OR numbered list (not mixed)
+
+**6. Citation-friendly formatting**
+- Every factual claim on its own sentence (not buried in a compound sentence)
+- Data points formatted consistently: `[number] [unit] — [Source, Year]`
+- No pronoun ambiguity: always name the subject explicitly
+- Use `<table>` comparisons where possible — AI agents parse tables well
+
+**7. Internal link structure note**
+Suggest 2–3 internal links with anchor text that includes secondary keywords — this signals topical authority to both Google and AI crawlers.
+
+#### GEO Output Block (added to QA Report)
+
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+GEO OPTIMIZATION CHECKLIST
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Answer-first structure (each H2):    ✅/❌
+Explicit entity labeling:            ✅/❌
+FAQ section present (min 5 Q&A):     ✅/❌
+Featured snippet candidate block:    ✅/❌ [paste block here]
+Citation-friendly formatting:        ✅/❌
+Structured data suggestions:
+  - FAQPage schema:                  ✅ applicable
+  - Article schema:                  ✅ applicable
+  - HowTo schema:                    ✅/❌ [applicable if how-to steps present]
+UGC sections present (E-E-A-T):      ✅/❌ [X sections from Stage 3]
+AI-bot parse score:                  [X/10]
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+---
+
+## Stage 6 — QA Scoring Report
+
+### SEO Score Rubric (100 points)
+
+| Check | Points | How to evaluate |
+|---|---|---|
+| Primary keyword in meta title | 10 | Exact or close match |
+| Primary keyword in H1 | 10 | Exact or close match |
+| Primary keyword in first 100 words | 10 | Check introduction |
+| Keyword density (1–1.5%) | 15 | Count occurrences / total word count |
+| Meta title length (≤60 chars) | 10 | Count characters |
+| Meta description length (≤160 chars) | 10 | Count characters |
+| H2/H3 structure present and logical | 10 | Min 3 H2s, logical flow |
+| Image alt text suggestions | 5 | Min 2 suggestions |
+| Internal linking suggestions | 10 | Min 2 suggestions |
+| Readability (short paragraphs) | 10 | No paragraph >5 lines |
+
+**Thresholds:**
+- 85–100: Publish-ready
+- 70–84: Minor fixes needed
 - Below 70: Needs revision
 
-### Grammar & Style Check
-| Issue | Location | Suggestion |
-|-------|----------|------------|
-| [issue type] | [location] | [fix suggestion] |
-
-### Tone Consistency
-- **Expected tone**: [tone from brief]
-- **Assessment**: [is the tone consistent]
-- **Flags**: [sections that drift off-tone, if any]
-
-### Improvement Suggestions
-1. [Suggestion 1]
-2. [Suggestion 2]
-3. [Suggestion 3]
-
-### Final Verdict
-- **Publish-ready?**: [Yes / Minor fixes / Needs revision]
-- **Key actions before publish**: [action list]
-```
-
----
-
-## Detailed Workflow
-
-### Phase 1: Content Brief Generation
+### Full Report Output
 
 ```
-Input (keyword + spec)
-  -> Step 1: Parse spec.md -> extract product info, target audience, tone, value prop
-  -> Step 2: Analyze the keyword -> determine search intent and best content type
-  -> Step 3: Keyword research using web search
-       - Search queries to run:
-           "[keyword] search volume 2025"
-           "people also ask [keyword]"
-           "[keyword] related keywords"
-           "[keyword] crypto/Web3" (if domain-specific)
-       - From results, extract and rank keywords by:
-           Relevance to the spec's product and audience (primary filter)
-           Search frequency signals found in results (secondary filter)
-           Long-tail specificity (prefer specific over generic)
-       - Assign each keyword a relevance tier: Primary / Secondary / LSI
-  -> Step 4: Competitor content analysis using web search
-       - Search query: "[keyword]" -> identify top 3-5 ranking results
-       - Fetch each result and analyze:
-           Heading structure (H2/H3 depth and topics covered)
-           Approximate word count
-           Subtopics covered vs. subtopics missing
-           Tone: beginner-friendly vs. technical
-       - Identify content gaps: subtopics the competitors do not cover or cover poorly
-       - Use gaps to define the differentiation angle for this article
-  -> Step 5: Generate outline -> H2/H3 structure and key points per section,
-             prioritizing gap topics identified in Step 4
-  -> Step 6: Compile the Content Brief
-  -> Output: Content Brief (.md)
-```
+╔══════════════════════════════════════════════╗
+║       CONTENT PIPELINE PRO — QA REPORT       ║
+╚══════════════════════════════════════════════╝
 
----
+ARTICLE: [Title]
+KEYWORD: [Primary keyword]
+WORD COUNT: [X words]
+UGC SECTIONS: [X sections from Stage 3]
 
-### Phase 2: Blog Writing
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SEO SCORE: [X/100]
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-```
-Input (Content Brief from Phase 1)
-  -> Step 1: Generate meta title + meta description (SEO-optimized)
-  -> Step 2: Write the introduction -> hook + context + thesis
-  -> Step 3: Write the body -> follow the outline
-       Data requirements:
-         - Minimum 3 statistics or data points per article
-         - Data sourced from: web search, the spec file, or clearly flagged as illustrative
-         - Each major claim should be supported by a number, example, or case
-  -> Step 4: Apply Writing Principles (see section below)
-  -> Step 5: Write the conclusion -> summary + CTA
-  -> Step 6: Add internal linking suggestions
-  -> Step 7: Format the final article (proper heading hierarchy, paragraph spacing)
-  -> Output: Complete Blog Article (.md)
-```
+| Check | Points | Status | Details |
+|-------|--------|--------|---------|
+| Primary keyword in meta title | 10 | ✅/❌ | [details] |
+| Primary keyword in H1 | 10 | ✅/❌ | [details] |
+| Primary keyword in first 100 words | 10 | ✅/❌ | [details] |
+| Keyword density (1–1.5%) | 15 | ✅/❌ | [X%] |
+| Meta title length (≤60 chars) | 10 | ✅/❌ | [X chars] |
+| Meta description length (≤160 chars) | 10 | ✅/❌ | [X chars] |
+| H2/H3 structure | 10 | ✅/❌ | [details] |
+| Image alt text suggestions | 5 | ✅/❌ | [details] |
+| Internal linking | 10 | ✅/❌ | [details] |
+| Readability | 10 | ✅/❌ | [details] |
 
-#### Writing Principles for Phase 2
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+GEO SCORE: [X/10]
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[GEO checklist block from Stage 5]
 
-**Tone guide (default for crypto/Web3 content):**
-- Write expert-to-peer: assume the reader knows basic crypto concepts but is not a developer
-- Be direct and confident — avoid hedging language
-- Use short sentences and paragraphs (3-4 lines max per paragraph)
-- Avoid jargon without explanation; when using technical terms, define them inline on first use
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+WRITING QUALITY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+AI patterns detected: [count] — [list with location]
+Tone consistency: [Consistent / Flags: section X drifts]
+Fact-check flags: [list claims marked [VERIFY]]
+Data points present: [X] — [meets/below minimum of 3]
 
-**Data requirements:**
-- Minimum 3 data points per article (stats, percentages, on-chain figures, market numbers)
-- Source data from web search or the spec file; if neither is available, flag the claim with `[VERIFY]`
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+FINAL VERDICT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SEO:        [Publish-ready / Minor fixes / Needs revision]
+GEO:        [Strong / Needs improvement]
+UGC:        [Enriched / Missing — add Stage 3 URLs]
+Verdict:    [Publish-ready / Minor fixes / Needs revision]
 
-**AI-pattern avoidance — never use the following:**
-- "In today's fast-paced world..."
-- "It's important to note that..."
-- "Furthermore," / "Moreover," / "In conclusion,"
-- "As we navigate the ever-evolving landscape of..."
-- "It goes without saying..."
-- "Delve into" / "Dive into"
-- Generic rhetorical questions as section openers ("Have you ever wondered...?")
-- Filler affirmations ("Absolutely!" / "Great question!")
-
-Instead: open sections with a direct statement or a specific fact. Let the data and examples carry the weight.
-
----
-
-### Phase 3: Editor & QA
-
-```
-Input (Blog Article from Phase 2 + Content Brief from Phase 1)
-  -> Step 1: SEO Audit -> score each checklist item using the rubric (see QA Report section)
-  -> Step 2: Grammar & Style Check -> spelling, grammar, sentence structure, word choice
-  -> Step 3: Tone Consistency Check -> compare article tone vs. brief/spec tone
-  -> Step 4: Readability Assessment -> sentence length, paragraph length, jargon level
-  -> Step 5: Fact-check flags -> highlight claims with [VERIFY] that need human confirmation
-  -> Step 6: AI-pattern scan -> flag any phrases from the avoidance list that slipped through
-  -> Step 7: Generate improvement suggestions
-  -> Step 8: Compile QA Report + Final Verdict using scoring thresholds
-  -> Output: QA & SEO Report (.md)
+Key actions before publish:
+1. [Action 1]
+2. [Action 2]
 ```
 
 ---
@@ -270,48 +666,31 @@ Input (Blog Article from Phase 2 + Content Brief from Phase 1)
 
 | Case | Handling |
 |---|---|
-| Keyword is too broad (e.g., "crypto") | Suggest 3-5 more specific long-tail keywords for the user to choose |
-| Spec file is missing info (no tone, no target audience) | Use default assumptions and clearly flag what was assumed |
-| Keyword does not match the project in the spec | Warn about the mismatch and ask the user to confirm before continuing |
-| The article needs high technical depth | Flag sections that require SME (Subject Matter Expert) review with `[SME REVIEW]` |
-| User wants Vietnamese | Support both English and Vietnamese, detect from input `language` |
-| Word count is too short (<500) or too long (>5000) | Warn and recommend a word count range that fits the topic |
-| QA detects major revisions are needed (score <70) | Mark as "Needs revision" and list concrete fixes with section references |
-| Web search returns no useful results for keyword research | Fall back to AI knowledge base and flag: "Keyword data based on training knowledge, not live search" |
-| Competitor content is behind a paywall or not fetchable | Skip that URL, move to next result, note it was skipped |
+| Keyword too broad (e.g., "crypto") | Stop. Suggest 3–5 long-tail alternatives. Ask user to choose before continuing. |
+| Spec file missing info | Use defaults. Flag every assumption with `[ASSUMED]`. |
+| Keyword doesn't match spec | Warn about mismatch. Ask for confirmation before continuing. |
+| Article needs deep technical content | Flag sections with `[SME REVIEW]`. Never fabricate technical details. |
+| User requests Vietnamese | Switch all output to Vietnamese. Keep all formats identical. |
+| Word count <500 or >5000 | Warn. Recommend 800–2500 for this topic type. |
+| SEO score below 70 | Mark "Needs revision". List specific fixes with section references. |
+| Web search unavailable | Flag each stage that requires it. Skip Stage 0. Fall back to training knowledge and label `[estimated]`. |
+| UGC URL behind login wall | Skip URL. Request user to paste comment text directly. |
+| No high-value comments found (all score <3) | Return: "No high-value comments in this thread. Try a different URL with more substantive discussion." |
+| <10 comments total | Process all. Add warning: "Limited comment data — insights may not be representative." |
+| Stage 0 finds no trending topics | Return: "No strong trending signals found for your domain right now. Suggest running keyword research on [3 evergreen topics from spec]." |
 
 ---
 
 ## Limitations (MVP)
 
-- Keyword research uses web search when enabled; if web search is off, AI falls back to training knowledge (flagged clearly in output)
-- Does not pull real-time data from SEMrush/Ahrefs APIs
-- Does not automatically publish to a CMS
-- Does not generate images for the blog
-- Fact-checking flags items with `[VERIFY]` but does not fully verify every claim
-- SEO score is calculated against the internal rubric, not a third-party tool score
-- Competitor analysis limited to publicly accessible pages (paywalled content is skipped)
-
----
-
-## Expansion Roadmap (if there is more time)
-
-- Integrate SEO tools: connect Ahrefs/SEMrush APIs to pull real keyword volume data
-- Auto-generate images: featured image and in-article images via AI image generation
-- Multi-format output: turn one blog into a Twitter thread, LinkedIn post, Telegram post
-- Content Calendar: input multiple keywords and generate a full monthly content calendar
-- Performance tracking: track ranking and traffic after publish, feed results back to refine the skill
-- Batch mode: input 10 keywords and output 10 blogs + 10 QA reports
-
----
-
-## Tech Stack / Tools
-
-- **Primary**: Claude Project (or Custom GPT)
-- **Skill format**: `SKILL.md` file with structured instructions
-- **Web search**: enabled for keyword research and competitor analysis in Phase 1
-- **Input format**: `.md` file (spec) + text input (keyword/topic)
-- **Output format**: `.md` files (brief, article, QA report)
+- Stage 0 is simulated monitoring via web search — not a live X API connection
+- Keyword volume data is estimated unless user provides API key
+- Does not connect to SEMrush/Ahrefs APIs automatically
+- Does not publish to any CMS
+- Does not generate images
+- `[VERIFY]` and `[DATA NEEDED]` flags require human review before publishing
+- SEO/GEO scores are based on internal rubric, not third-party tools
+- UGC only covers publicly accessible pages
 
 ---
 
@@ -319,8 +698,33 @@ Input (Blog Article from Phase 2 + Content Brief from Phase 1)
 
 | Metric | Before (Manual) | After (Skill) | Improvement |
 |---|---|---|---|
-| Time per blog article | 4-8 hours | 10-15 minutes | ~90% faster |
+| Time per blog article | 4–8 hours | 15–25 minutes | ~85% faster |
+| Missed trending topics | High (offline = miss) | Auto-proposed on session start | Near zero |
+| UGC enrichment | 1–2 hours manual hunting | 2 minutes automated | ~95% faster |
 | Output consistency | Depends on writer | Same format every time | Consistent |
-| SEO optimization | Manual checks, often missed | Automatic scored checklist | Comprehensive |
-| QA coverage | Self-review, easy to miss | Systematic checklist with rubric | Thorough |
-| Scale capacity | 1-2 articles/day | 10+ articles/day | 5-10x |
+| GEO optimization | Never done | Built into every article | 100% coverage |
+| AI citation potential | Low (generic content) | High (E-E-A-T + GEO signals) | Significant |
+| Scale capacity | 1–2 articles/day | 8–10 articles/day | 5x |
+
+---
+
+## Expansion Roadmap
+
+- Real X API integration: replace simulated monitoring with live streaming API
+- Ahrefs/SEMrush API: exact keyword volume data instead of estimates
+- Auto-generate images: featured image + in-article via AI image generation
+- Multi-format output: one blog → Twitter thread, LinkedIn post, Telegram post, newsletter
+- Content Calendar: input 10 keywords → full monthly content calendar
+- Performance tracking: monitor ranking + traffic post-publish → feed back to refine skill
+- Batch mode: 10 keywords → 10 blogs + 10 QA reports
+
+---
+
+## Tech Stack / Tools
+
+- **Primary**: Claude Project (or Custom GPT)
+- **Skill format**: `SKILL.md` with structured instructions
+- **Web search**: enabled — required for Stage 0, Stage 1, Stage 4 data sourcing
+- **URL fetching**: `web_fetch` — required for Stage 3 UGC mining
+- **Input format**: `.md` file (spec) + text input (keyword/topic) + optional URLs (UGC)
+- **Output format**: `.md` files (brief, article, QA report)
