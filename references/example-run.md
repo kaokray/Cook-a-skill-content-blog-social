@@ -1,4 +1,4 @@
-# Example Run — Content Pipeline Pro
+# Example Run — Auto Content Blog
 
 **Keyword**: `is bitcoin a safe haven`
 **Spec**: Crypto/Web3 product focused on macro analysis and DeFi, target audience = retail crypto investors who follow market news and want data-backed takes, not surface-level explainers.
