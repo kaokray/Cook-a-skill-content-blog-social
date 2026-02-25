@@ -1,4 +1,4 @@
-# Cook-a-skill-content-blog-social
+# Cook-a-skill-auto-content-blog
 
 ## What problem does this skill solve?
 
