@@ -1,5 +1,4 @@
----
-name: content-pipeline-pro
+name: Auto-content-blog
 description: >
   Full end-to-end SEO + GEO content creation pipeline for crypto/Web3 teams.
   Trigger this skill when the user wants to: write a blog post or article, research
@@ -15,26 +14,28 @@ description: >
 
 # Content Pipeline Pro
 
-End-to-end pipeline: trending topic → keyword research → brief → UGC enrichment → human-style draft → SEO + GEO optimization → scored QA report.
+End-to-end pipeline: trending topic → keyword research → brief → UGC enrichment → human-style draft → visual & link enrichment → SEO + GEO optimization → scored QA report.
 
 ## Pipeline
 
 ```
-[0] X TREND MONITOR  → auto-run on session start, propose hot keywords
-[1] KEYWORD RESEARCH → scored, data-backed selection
-[2] CONTENT BRIEF    → outline + keyword map + UGC insertion points
-[3] UGC ENRICHMENT   → mine comments → ready-to-paste blog sections
-[4] DRAFT            → human-style, data-backed, zero AI patterns
-[5] SEO + GEO        → on-page checklist + AI-bot-friendly formatting
-[6] QA REPORT        → rubric score + publish verdict
+[0]   X TREND MONITOR   → auto-run on session start, propose hot keywords
+[1]   KEYWORD RESEARCH  → scored, data-backed selection
+[2]   CONTENT BRIEF     → outline + keyword map + UGC insertion points
+[3]   UGC ENRICHMENT    → mine comments → ready-to-paste blog sections
+[4]   DRAFT             → human-style, data-backed, zero AI patterns
+[4.5] VISUAL & LINKS    → data charts (matplotlib) + inline hyperlinks on every citation
+[5]   SEO + GEO         → on-page checklist + AI-bot-friendly formatting
+[6]   QA REPORT         → rubric score + publish verdict
 ```
 
-Enter at any stage. Run all 7 from scratch. Start at Stage 5 for existing drafts.
+Enter at any stage. Run all stages from scratch. Start at Stage 5 for existing drafts.
 
 **Quick commands:**
 - `run full pipeline` → Stage 0 → Stage 6
 - `start from stage [N]` → enter at any stage
 - `score my draft` → Stage 5 → Stage 6
+- `enrich my draft` → Stage 4.5 only (charts + links on existing draft)
 
 **Reference files** (read when detail is needed):
 - `references/scoring-rubrics.md` — all scoring tables (trend, keyword, UGC, SEO, GEO)
@@ -151,6 +152,123 @@ Output format → see `references/output-templates.md` Stage 4
 
 ---
 
+## Stage 4.5 — Visual & Link Enrichment
+
+**Runs automatically after Stage 4 is complete. Cannot be skipped — required for publish-ready output.**
+
+### Why This Stage Exists
+- Data charts are 3× more likely to be cited by AI search engines than the same data in plain text
+- Inline hyperlinks on every source citation signal editorial credibility to Google and AI crawlers
+- Every unlinked `— Source, Year` is a missed E-E-A-T trust signal
+
+---
+
+### Step 1 — Identify Chart Opportunities
+
+Scan the draft for data points that meet **at least one** of these criteria:
+
+| Criterion | Example |
+|---|---|
+| Change over time (2+ periods) | "TVL grew from $2B to $8B in 6 months" |
+| Compares 2+ assets or metrics | "Lido APY 3.8% vs solo staking 3.2%" |
+| Inflow / outflow trend | "$1.2B ETF inflows in Q1 2025" |
+| Index or score over time | "Fear & Greed Index: 12/100" |
+| Ratio that changed | "ETH staking ratio: 18% → 27% in 12 months" |
+| 3+ data points in a series | Monthly DEX volume figures |
+
+**Chart types by data shape:**
+
+| Data type | Chart type |
+|---|---|
+| Performance over time | Line chart with fill-under |
+| Inflows / outflows | Bar chart — green positive, red negative |
+| Index or score over time | Bar chart with color-coded zones |
+| Ratio or comparison over time | Line or area chart |
+| Single-point comparison | Horizontal bar or stat callout box |
+
+**Chart design standards (apply to every chart):**
+- Background: `#F7F7F7` (light gray), no heavy gridlines
+- Primary color: `#E8650A` (orange, default for crypto/Web3 — adjust to project brand if spec defines one)
+- Remove top + right spine
+- Annotate key data points directly on chart (peak, trough, threshold)
+- Source line at bottom-left: gray italic — `Source: [Name] | [Notes]`
+- Font: DejaVu Sans (matplotlib default)
+- Resolution: 150 DPI minimum
+- Always generate alt text for every chart
+
+**Maximum 6 charts per article.** More than 6 slows page load. Excess data points → stat callout boxes instead.
+
+If no qualifying data points found: output a styled stat callout box for that statistic instead of a chart.
+
+---
+
+### Step 2 — Generate Charts
+
+Use Python + matplotlib. Execute in the computing environment.
+
+For each chart, produce:
+1. PNG image embedded in the output
+2. Caption (1–2 sentences): `Chart [N]: [What it shows]. [Time period]. Sources: [Name].`
+3. Alt text string for CMS upload: `[Chart type] showing [metric] from [start] to [end]. [Key finding in one sentence].`
+
+Place each chart **immediately after** the paragraph that first introduces its data. Never stack two charts back-to-back without body text between them.
+
+---
+
+### Step 3 — Convert All Source Citations to Hyperlinks
+
+Scan the entire draft for every inline source citation. Patterns to find:
+
+| Pattern | Example |
+|---|---|
+| `— [Source, Year]` | `— CoinDesk, Jan 2025` |
+| `per [Source]` | `per DeFiLlama` |
+| `according to [Source]` | `according to Messari` |
+| `[Source] reports` | `Dune Analytics reports` |
+| `([Source])` | `(CoinGecko)` |
+
+**For each citation:**
+1. Run web search: `[publication] [topic] [approximate date]`
+2. Verify URL resolves
+3. Replace plain-text source with inline hyperlink — anchor text = source name
+4. If exact article not found: link to publication homepage + flag `[VERIFY URL]`
+5. If citation is vague ("analysts say"): flag `[SOURCE NEEDED]` — never invent a source
+
+**Link rules:**
+- Prefer original publisher over aggregators
+- No paywalled links if a free version exists
+- All external links: open in new tab in HTML output
+- Do not add links to unattributed claims
+
+---
+
+### Step 4 — Output Summary
+
+Append this block to the enriched draft:
+
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+STAGE 4.5 — VISUAL & LINK ENRICHMENT SUMMARY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Charts generated:      [N] / [max 6]
+  - Chart 1: [title] → placed after [section name]
+  - Chart 2: [title] → placed after [section name]
+
+Source links resolved: [N] / [total citations found]
+  - [Source name] → [URL] ✅
+  - [Source name] → [URL] ⚠️ [VERIFY URL — linked to homepage]
+
+Unlinked citations flagged: [N]
+  - "[claim]" → [SOURCE NEEDED]
+
+Alt text strings:
+  Chart 1: "[alt text]"
+  Chart 2: "[alt text]"
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+---
+
 ## Stage 5 — SEO + GEO Optimization
 
 ### SEO Checklist
@@ -210,6 +328,12 @@ Output format → see `references/output-templates.md` Stage 6
 | No ugc_urls provided | Skip Stage 3. Mark UGC = Missing in QA. |
 | Stage 0 finds no trends | List 3 evergreen topics from spec context. |
 | User enters mid-pipeline | Start at appropriate stage. Ask what they have. |
+| Stage 4.5: no chart-worthy data | Output stat callout boxes for all key numbers. Flag: "No time-series or comparison data found — consider adding benchmark data in Stage 4 revision." |
+| Stage 4.5: more than 6 chart-worthy points | Prioritize: (1) comparisons, (2) trends, (3) index scores. Remainder → stat callout boxes. |
+| Stage 4.5: all source URLs paywalled | Link to publisher homepages. Flag every instance `[VERIFY URL]`. List all in enrichment summary. |
+| Stage 4.5: source article not found | Link to publication homepage + flag `[SOURCE NEEDED — could not verify]`. |
+| Stage 4.5: citation is vague ("analysts say") | Flag `[SOURCE NEEDED]`. Never invent a source. |
+| Stage 4.5: web search unavailable | Skip link resolution. Flag all citations `[HYPERLINK NEEDED — web search off]`. Charts still generated from in-draft data. |
 
 ---
 
@@ -217,7 +341,8 @@ Output format → see `references/output-templates.md` Stage 6
 
 - Stage 0: simulated X monitoring via web search, not live X API
 - Keyword volume: estimated unless user provides API key
-- No CMS auto-publishing, no image generation
-- `[VERIFY]` and `[DATA NEEDED]` require human review before publishing
+- No CMS auto-publishing, no image generation (editorial)
+- Stage 4.5 generates data charts from in-draft data via matplotlib — does NOT generate decorative or editorial images
+- `[VERIFY]`, `[DATA NEEDED]`, `[SOURCE NEEDED]`, and `[VERIFY URL]` flags require human review before publishing
 - SEO/GEO scores: internal rubric, not third-party tool scores
 - UGC mining: public pages only
