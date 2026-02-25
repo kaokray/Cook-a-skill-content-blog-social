@@ -2,7 +2,7 @@
 
 | Field | Details |
 |---|---|
-| **Skill Name** | Content Pipeline Pro |
+| **Skill Name** | Auto Content Blog |
 | **What gets automated** | The full blog production workflow — from detecting trending topics on X, keyword research, content brief, mining real UGC from community discussions, writing a human-style draft, auto-generating data charts + resolving all source citations to live hyperlinks, to SEO + GEO optimization and pre-publish QA scoring |
 | **BEFORE: manual process** | Manual keyword research (~1h) → write brief (~30 min) → write draft (~3–5h) → manually find + add source links (~30 min) → self-check SEO (~30 min) → no UGC step, no data charts, no GEO optimization. Total: **5–8 hours per article**. Output quality varies by writer. High chance of missing trends when offline. |
 | **AFTER: with skill** | Open session → Stage 0 auto-proposes hot X trends → pick keyword → Stage 1–6 runs the full pipeline → publish-ready blog article with embedded data charts, 100% hyperlinked citations, and QA report. Total: **15–25 minutes per article**. Consistent format every time. Real community UGC embedded. GEO-optimized for AI search engine citation. |
