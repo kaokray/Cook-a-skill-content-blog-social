@@ -1,4 +1,4 @@
-# Output Templates — Content Pipeline Pro
+# Output Templates — Auto Content Blog
 
 Standard output formats for each stage. Copy these into AI output exactly.
 
