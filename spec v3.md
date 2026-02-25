@@ -1,7 +1,4 @@
-# SKILL SPEC: Content Pipeline Pro v2
-**Owner**: Huỳnh Anh Dương (Kray) | **Domain**: Content Writing / SEO / GEO | **Version**: 2.1
-
----
+# SKILL SPEC: Auto Content Blog
 
 ## Overview
 
