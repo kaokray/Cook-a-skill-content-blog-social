@@ -1,4 +1,5 @@
-name: Auto-content-blog
+---
+name: content-pipeline-pro
 description: >
   Full end-to-end SEO + GEO content creation pipeline for crypto/Web3 teams.
   Trigger this skill when the user wants to: write a blog post or article, research
