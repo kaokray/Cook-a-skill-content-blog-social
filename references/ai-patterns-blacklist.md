@@ -1,4 +1,4 @@
-# AI-Pattern Blacklist — Content Pipeline Pro
+# AI-Pattern Blacklist — Auto Content Blog
 
 When writing in Stage 4, never use any phrase on this list.
 If you catch yourself writing one: stop and rewrite starting with a fact or direct claim.
