@@ -1,4 +1,4 @@
-# Scoring Rubrics — Content Pipeline Pro
+# Scoring Rubrics — Auto Content Blog
 
 ---
 
