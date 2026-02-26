@@ -128,24 +128,27 @@ Ensure the writer never misses a trending topic while offline. Every time a new 
 ### How it works
 
 **Step 1 — Parse the spec**
-Read `project_spec.md` to extract: domain/niche (e.g., DeFi, liquid staking, perp DEX), target audience, key product themes, and competitor names.
+Read `project_spec.md` to extract: domain/niche (e.g., DeFi, liquid staking, perp DEX), target audience, key product themes, and competitor names. Use this as a **relevance filter in Step 3**, not as a search limiter in Step 2.
 
 **Step 2 — Run X trend searches**
-Use web search to simulate real-time X monitoring. Run all of the following:
+Use web search to simulate real-time X monitoring. **Always start with broad crypto/Web3 market searches first**, then run spec-specific queries. Do NOT limit searches to the project's domain only — the goal is to surface the hottest topics across the entire market, then evaluate which ones are relevant.
 
-```
-site:x.com [domain keyword] -filter:replies
-[domain keyword] trending twitter 2025
-[domain keyword] discussion OR debate OR thread twitter
-[competitor name] twitter sentiment 2025
-[domain keyword] viral tweet this week
-```
-
-For crypto/Web3, also run:
+Run all broad market searches first:
 ```
 crypto twitter trending today
 defi twitter hot topic this week
-[domain keyword] CT (crypto twitter) discussion
+crypto CT discussion trending [current year]
+altcoin narrative trending twitter [current year]
+web3 viral tweet this week
+crypto debate twitter [current year]
+```
+
+Then run spec-specific searches to find ecosystem angles:
+```
+site:x.com [domain keyword] -filter:replies
+[domain keyword] trending twitter [current year]
+[domain keyword] discussion OR debate OR thread twitter
+[competitor name] twitter sentiment [current year]
 ```
 
 **Step 3 — Score each topic by trending potential**
@@ -154,8 +157,10 @@ defi twitter hot topic this week
 |---|---|---|
 | Recency (posted within 48h) | 30% | Within 24h = 10, 24–48h = 7, older = 3 |
 | Estimated engagement | 30% | Viral (1K+ likes signals) = 10, high = 7, low = 3 |
-| Relevance to spec domain | 25% | Direct = 10, adjacent = 6, weak = 2 |
+| Content opportunity for spec audience | 25% | High fit (audience would search this) = 10, adjacent = 6, weak fit = 2 |
 | Debate / controversy signal | 15% | Active debate = 10, one-sided = 5, none = 2 |
+
+Note on "Content opportunity": a topic does NOT need to be about the spec's project directly. It just needs to be something the spec's target audience (e.g., DeFi users, crypto investors) would actively search for or care about. A trending narrative about Hyperliquid, Berachain, or ETH ETF is fair game even if the spec is Sonic-focused.
 
 **Step 4 — Output trend alert**
 
@@ -165,11 +170,12 @@ Present at session start, before any user input:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 🔥 X TREND ALERT — [Date/Time]
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Based on your project spec, here's what's hot on X right now:
+Based on the full crypto/Web3 market scan, here's what's hot on X right now:
 
 TREND 1 (Score: X/10) 🔴 HOT
   Topic:              [topic name]
   Why it's trending:  [1-sentence explanation]
+  Audience fit:       [why your spec's audience would care about this]
   Blog angle:         [specific content angle]
   Suggested keyword:  "[keyword]"
   X discussion:       "[paraphrased post or thread summary]"
@@ -177,12 +183,14 @@ TREND 1 (Score: X/10) 🔴 HOT
 TREND 2 (Score: X/10) 🟡 RISING
   Topic:              [topic name]
   Why it's trending:  [1-sentence explanation]
+  Audience fit:       [why your spec's audience would care about this]
   Blog angle:         [specific content angle]
   Suggested keyword:  "[keyword]"
 
 TREND 3 (Score: X/10) 🟢 WATCH
   Topic:              [topic name]
   Why it's trending:  [1-sentence explanation]
+  Audience fit:       [why your spec's audience would care about this]
   Blog angle:         [specific content angle]
   Suggested keyword:  "[keyword]"
 
