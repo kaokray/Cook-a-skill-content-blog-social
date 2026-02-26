@@ -1,4 +1,4 @@
-# AI Showcase — Kray / Crypto Blog Content Pipeline
+# AI Showcase — Kray / Auto Content Blog
 
 Các khoảnh khắc dùng AI xuất sắc nhất trong 4 ngày cook.
 
